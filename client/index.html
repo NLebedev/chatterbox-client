@@ -15,11 +15,23 @@
     <script src="scripts/app.js"></script>
   </head>
   <body>
+    
     <div id="main">
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
     </div>
-    <div id="chats"></div>
+    <div id="chats">
+      <select class="form-control room-select">
+      </select>
+      <div class="actual-messages"></div>
+          
+          <input type="text" class="form-control" id="username-field" placeholder="Username...">
+          <textarea class="form-control" id="message-field" placeholder="Your text..."></textarea>
+          <button class="btn btn-primary btn-send">Send!</button>
+    </div>
+    <div class="">
+    </div>
     <div id="roomSelect"></div>
-  </body>
+    </body>
 </html>
+    

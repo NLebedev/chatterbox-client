@@ -25,7 +25,16 @@ app.send = function(message) {
 var appendDataToDOM = function(arr) {
   for (var i = arr.length - 1; i > 0; i--) {
     // console.log(i);
-    app.addMessage(arr[i]);
+    if (
+      //there is no filter
+      window.roomFilter === '' || 
+      //there is filter that is equal to our current message roomname
+      window.roomFilter === encodeURI(arr[i].roomname) ) {
+
+
+
+      app.addMessage(arr[i]);
+    } 
   }
 };
 
@@ -49,10 +58,13 @@ app.fetch = function() {
 // }); 
 
 app.clearMessages = function() {
-  $('#chats').empty();
+  $('.actual-messages').empty();
+  idObj = {};
 };
 
 window.idObj = {};
+window.roomNames = {};
+window.roomFilter = ''; 
 
 app.addMessage = function(message) {
   var myDate = new Date(message.createdAt);
@@ -70,28 +82,44 @@ app.addMessage = function(message) {
 
   var objId = message.objectId;
   
+  if (!roomNames[message.roomname] && message.roomname !== undefined) {
+    app.addRoom(message.roomname);
+    roomNames[message.roomname] = message.roomname;
+  }
+ 
   
   //var node = '<div>' + '/<div>';
   if (!idObj[objId]) {
-    $('#chats').append('<div id="' + objId + '"></div>');
+    $('.actual-messages').append('<div id="' + objId + '"></div>');
     $('#' + objId).text(hours + ':' + minutes + ' ' + roomName + ' | ' + user + ': ' + messageText );
     idObj[objId] = objId;
   }
 
 };
 
+
+
 app.addRoom = function(roomName) {
-  $('#roomSelect').append('<div>' + roomName + '</div>');
-
+  $('.room-select').append('<option value=' + encodeURI(roomName) + '>' + roomName + '</option>');
 };
-
+        
 app.addFriend = function(username) {
 };
 
+
 $(document).ready(function() {
   
-  $('.get-btn').click(function() {
-    app.fetch();
+  $('.btn-send').click(function() {
+    var temp = {};
+    temp.text = $('#message-field').val();
+    temp.username = $('#username-field').val();
+    app.send(temp);
+    console.log(temp);
+  });
+  
+  $('.room-select').change(function() {
+    roomFilter = this.value;
+    app.clearMessages();
   });
 
   $('.user-link').click(function() {
@@ -102,5 +130,9 @@ $(document).ready(function() {
   });
   // init();
 }); 
+
+var updateRoomNames = function() {
+  $('.room-select').append();
+};
 
 setInterval(function() { app.fetch(); }, 1000);
