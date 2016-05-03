@@ -2,8 +2,26 @@
 
 var app = {};
 app.server = 'https://api.parse.com/1/classes/messages';
-app.init = function() {
-   // $()
+
+var idToName = function(id) {
+  return allMessages[id].username;
+};
+
+app.createLink = function(id) {
+  $('.' + id).click(function() {
+    
+    app.addFriend(id);
+    
+    $('.message-class').each(function() {
+      var secondClass = $(this).attr('class').split(' ')[1];
+      
+      if (friends[idToName(secondClass)]) {
+      //make this element bold
+        $(this).css('font-weight', 'bold');
+      }
+    });
+
+  });
 };
 
 app.send = function(message) {
@@ -65,6 +83,8 @@ app.clearMessages = function() {
 window.idObj = {};
 window.roomNames = {};
 window.roomFilter = ''; 
+window.allMessages = {};
+window.friends = {};
 
 app.addMessage = function(message) {
   var myDate = new Date(message.createdAt);
@@ -82,32 +102,58 @@ app.addMessage = function(message) {
 
   var objId = message.objectId;
   
+  allMessages[objId] = {
+    message: messageText,
+    roomname: roomName,
+    username: user
+  };
+
+
+
   if (!roomNames[message.roomname] && message.roomname !== undefined) {
     app.addRoom(message.roomname);
     roomNames[message.roomname] = message.roomname;
   }
  
-  
-  //var node = '<div>' + '/<div>';
+    
+  //NEW NODES!!!
   if (!idObj[objId]) {
-    $('.actual-messages').append('<div id="' + objId + '"></div>');
-    $('#' + objId).text(hours + ':' + minutes + ' ' + roomName + ' | ' + user + ': ' + messageText );
+    $('.actual-messages').append('<div class="message-class ' + objId + '"></div>');
+    $('.' + objId).text(hours + ':' + minutes + ' ' + roomName + ' | ' + user + ': ' + messageText );
     idObj[objId] = objId;
+    app.createLink(objId);
+    if (friends[user]) {
+      app.applyCssToFriends(objId);
+    }
   }
+
 
 };
 
+app.applyCssToFriends = function(id) {
+  $('.' + id).css('font-weight', 'bold');
+};
 
 
 app.addRoom = function(roomName) {
   $('.room-select').append('<option value=' + encodeURI(roomName) + '>' + roomName + '</option>');
 };
         
-app.addFriend = function(username) {
+app.addFriend = function(id) {
+  var messageObj = allMessages[id];
+  var myUser = messageObj.username;
+  //find message with this id in all messages,
+  friends[myUser] = myUser;
+    //find username
+    //add username to our friends object
+
 };
 
 
+
+
 $(document).ready(function() {
+  
   
   $('.btn-send').click(function() {
     var temp = {};
@@ -122,12 +168,7 @@ $(document).ready(function() {
     app.clearMessages();
   });
 
-  $('.user-link').click(function() {
-    console.log('inside');
-    //seond class
-    var secondClass = $(this).attr('class').split(' ')[1];
-    app.addFriend(secondClass);
-  });
+  
   // init();
 }); 
 
