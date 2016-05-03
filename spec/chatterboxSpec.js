@@ -99,7 +99,7 @@ describe('chatterbox', function() {
         sinon.spy(app, 'addFriend');
 
         app.addMessage({
-          username: 'Mel Brooks',
+          username: 'MelBrooks',
           text: 'I didn\'t get a harumph outa that guy.!',
           roomname: 'lobby'
         });
