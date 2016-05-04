@@ -3,7 +3,7 @@
 ////////////////////
 
 //object with all message Ids
-var app = {};
+let app = {};
 app.idStorage = {};
 //objet with all roomnames
 app.roomNames = {};
@@ -26,9 +26,9 @@ app.init = function() {
 
 
 //send data to chatroom
-app.send = function(message) {
+app.send = message => {
   $.ajax({
-    url: this.server,
+    url: app.server,
     data: JSON.stringify(message),  
     type: 'POST',
     success: function(data) {
@@ -44,35 +44,35 @@ app.send = function(message) {
 ////////////////////
 
 //receive data with all the messages from chat room
-app.fetch = function(roomname) {
-  var data = roomname !== undefined ? '' : { where: { roomname: roomname } }; 
+app.fetch = roomname => {
+  let data = roomname === undefined ? '' : { where: { roomname: roomname } }; 
+  // console.log("THIS: ", this);
   $.ajax({
-    url: this.server,
+    url: app.server,
     type: 'GET',
     contentType: 'application/json',
-   
     data: data,
     success: function(data) {
       console.log(data);
-      appendDataToDOM(data.results);
+      appendDataToDOM(data.results);  
     },
     error: function (data) {
       console.error('chatterbox: Failed to fetch data', data);
     }
   });
 };
-////////////////////
+////////////////////s
 
 //convert message id to usrname
-app.idToName = function(id) {
-  return this.allMessages[id].username;
+app.idToName = id => {
+  return app.allMessages[id].username;
 };
 ////////////////////
 
-//
-app.createLink = function(id) {
+//  
+app.createLink = id => {
   $('.' + id).click(function() {
-    var secondClass = $(this).attr('class').split(' ')[1];
+    let secondClass = $(this).attr('class').split(' ')[1];
     
     //if the user is not a friend yet
     if ( !app.friends[app.idToName(secondClass)] ) {
@@ -80,7 +80,7 @@ app.createLink = function(id) {
       app.addFriend(id);
       //update font weight in other nodes
       $('.message-class').each(function() {
-        var secondClass = $(this).attr('class').split(' ')[1];
+        let secondClass = $(this).attr('class').split(' ')[1];
         
         if (app.friends[app.idToName(secondClass)]) {
         //make this element bold
@@ -93,7 +93,7 @@ app.createLink = function(id) {
       app.removeFriend(id);
       //change back font weight
       $('.message-class').each(function() {
-        var secondClass = $(this).attr('class').split(' ')[1];
+        let secondClass = $(this).attr('class').split(' ')[1];
         
         if (!app.friends[app.idToName(secondClass)]) {
         //make this element bold
@@ -102,20 +102,11 @@ app.createLink = function(id) {
       }); 
 
     }
-
-  
-
-
-    
-    
-
-
   });
 };
 
-
-var appendDataToDOM = function(arr) {
-  for (var i = arr.length - 1; i > 0; i--) {
+var appendDataToDOM = arr => {
+  for (let i = arr.length - 1; i > 0; i--) {
     // console.log(i);
     if (
       //there is no filter
@@ -130,24 +121,23 @@ var appendDataToDOM = function(arr) {
   }
 };
 
-
-app.clearMessages = function() {
+app.clearMessages = () => {
   $('.actual-messages').empty();
-  this.idStorage = {};
+  app.idStorage = {};
 };
 
-app.addMessage = function(message) {
+app.addMessage = message => {
   //deal with date
-  var myDate = new Date(message.createdAt);
-  var minutes = myDate.getMinutes();
+  let myDate = new Date(message.createdAt);
+  let minutes = myDate.getMinutes();
   minutes = minutes < 10 ? '0' + minutes : minutes;
-  var hours = myDate.getHours();
+  let hours = myDate.getHours();
   //
-  var messageText = message.text;
-  var roomName = message.roomname;
-  var objId = message.objectId;
+  const messageText = message.text;
+  const roomName = message.roomname;
+  const objId = message.objectId;
   
-  this.allMessages[objId] = {
+  app.allMessages[objId] = {
     message: message.text,
     roomname: message.roomname,
     username: message.username
@@ -170,18 +160,18 @@ app.addMessage = function(message) {
   }
 };
 
-app.applyCssToFriends = function(id) {
+app.applyCssToFriends = id => {
   $('.' + id).css('font-weight', 'bold');
 };
 
 
-app.addRoom = function(roomName) {
+app.addRoom = roomName => {
   $('.room-select').append('<option value=' + encodeURI(roomName) + '>' + roomName + '</option>');
 };
         
-app.addFriend = function(id) {
-  var messageObj = this.allMessages[id];
-  var myUser = messageObj.username;
+app.addFriend = id => {
+  const messageObj = app.allMessages[id];
+  const myUser = messageObj.username;
   //find message with this id in all messages,
   app.friends[myUser] = myUser;
     //find username
@@ -189,8 +179,8 @@ app.addFriend = function(id) {
 
 };
 
-app.removeFriend = function(id) {
-  delete app.friends[this.allMessages[id].username]; 
+app.removeFriend = id => {
+  delete app.friends[app.allMessages[id].username]; 
 };
 
 
@@ -199,7 +189,7 @@ $(document).ready(function() {
   
   
   $('.btn-send').click(function() {
-    var temp = {};
+    let temp = {};
     temp.text = $('#message-field').val();
     temp.username = $('#username-field').val();
     temp.roomname = $('#roomname-field').val();
